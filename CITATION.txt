@@ -1,0 +1,12 @@
+To reference the PyParti software in publications, please cite:
+
+Edward Pearce, PyParti: Python for Partitions, (2020), GitHub repository, https://github.com/edwardmpearce/pyparti
+
+@misc{Pearce2020,
+  author = {Edward Pearce},
+  title = {{PyParti}: {Python} for {Partitions}},
+  year = {2020},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/edwardmpearce/pyparti}}
+}
