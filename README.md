@@ -1,6 +1,10 @@
-# PyParti
-**Py**thon for **Parti**tions: Using Python and computational mathematics software [SageMath](https://www.sagemath.org/) to experiment with 
-[integer partitions](https://en.wikipedia.org/wiki/Partition_(number_theory)), 
+# PyParti: **Py**thon for **Parti**tions
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/edwardmpearce/pyparti/master)
+
+PyParti (**Py**thon for **Parti**tions) is a tool based on Python (3.6+) and 
+computational mathematics software [SageMath](https://www.sagemath.org/) (9.0+)
+to experiment with [integer partitions](https://en.wikipedia.org/wiki/Partition_(number_theory)), 
 [Young diagrams](https://en.wikipedia.org/wiki/Young_tableau#Diagrams), 
 and related concepts in [combinatorics](https://en.wikipedia.org/wiki/Combinatorics).
 This repository contains:
