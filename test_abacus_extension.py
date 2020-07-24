@@ -67,7 +67,7 @@ def test_from_G_core_and_quotient(max_r=15, max_p_size=20):
             print(f"Test passed for r = {r}")
         else:
             test_success = False
-    return test_success
+    assert test_success
 
 
 def test_from_G_abacus(max_r=15, max_p_size=20):
@@ -99,7 +99,7 @@ def test_from_G_abacus(max_r=15, max_p_size=20):
             print(f"Test passed for r = {r}")
         else:
             test_success = False
-    return test_success
+    assert test_success
 
 
 def test_special_core(max_r=15, max_p_size=20):
@@ -110,7 +110,7 @@ def test_special_core(max_r=15, max_p_size=20):
     
     Iterates over partitions up to (not including) size `max_p_size`, and moduli `r` up to (not including) `max_r`.
     """
-    return all(PartitionExt(p).G_core(r) == p.core(r) for n in range(max_p_size) for p in Partitions(n) for r in range(1,max_r))
+    assert all(PartitionExt(p).G_core(r) == p.core(r) for n in range(max_p_size) for p in Partitions(n) for r in range(1,max_r))
 
 
 def test_special_quotient(max_r=15, max_p_size=20):
@@ -125,7 +125,7 @@ def test_special_quotient(max_r=15, max_p_size=20):
     in the $r$-quotient and $(r,r-1)$-quotient differ by a reflection of indices. We adjust for this before comparison.
     `Partition.content` -> $j - i$, whilst $(r,-1)$-colour -> $i - j (mod r)$ from $(r,b)$-colour -> $i + bj (mod r)$.
     """
-    return all(PartitionExt(p).G_quotient(r, b=-1, label_swap_xy=True) == p.quotient(r) 
+    assert all(PartitionExt(p).G_quotient(r, b=-1, label_swap_xy=True) == p.quotient(r) 
                for n in range(max_p_size) for p in Partitions(n) for r in range(1,max_r))
 
 
