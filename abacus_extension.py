@@ -15,6 +15,7 @@ This module includes the following functions related to constructing partitions 
 from collections import deque # deque is list-like container with faster popleft
 
 # SageMath imports
+import sage.all
 from sage.combinat.partition import Partition, Partitions
 from sage.arith.all import gcd
 

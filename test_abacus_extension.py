@@ -22,6 +22,7 @@ TODO: Complete documentation; include examples in the documentation?
 # Third-party imports
 
 # SageMath imports
+import sage.all
 from sage.combinat.partition import Partition, Partitions
 from sage.arith.all import gcd
 

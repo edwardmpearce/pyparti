@@ -46,6 +46,6 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --statistics
       - name: Test with pytest
         shell: pwsh
-        run: sage -sh; pytest --cov=./ --cov-report=xml
+        run: pytest --cov=./ --cov-report=xml
       - name: Upload coverage
         uses: codecov/codecov-action@v1
