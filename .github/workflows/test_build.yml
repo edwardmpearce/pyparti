@@ -1,0 +1,52 @@
+# References: Using Python with GitHub Actions https://docs.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions
+# Testing your Python Project with GitHub Actions https://gist.github.com/mwouts/9842452d020c08faf9e84a3bba38a66f
+# Example of continuous integration with conda https://github.com/mwouts/jupytext/blob/master/.github/workflows/continuous-integration-conda.yml
+# Quickstart continuous integration using predefined workflows https://medium.com/swlh/automate-python-testing-with-github-actions-7926b5d8a865
+name: tests
+on:
+  # Trigger on pushes to the master branch
+  push:
+    branches:
+      - master
+  # Or on pull requests against the master branch
+  pull_request:
+    branches:
+      - master
+jobs:
+  tests_job:
+    strategy:
+      # Spawn and run a job for each of two supported operating systems and three supported Python 3.x versions
+      matrix:
+        os: ['ubuntu-latest', 'macos-latest']
+        python: [3.6, 3.7, 3.8]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Cache conda
+        uses: actions/cache@v1
+        with:
+          path: ~/conda_pkgs_dir
+          key: conda-${{ matrix.os }}-python-${{ matrix.python-version }}-${{ hashFiles('tests.yml') }}
+      - name: Setup Miniconda
+        uses: goanpeca/setup-miniconda@v1
+        with:
+          auto-update-conda: true
+          auto-activate-base: false
+          channels: defaults,conda-forge
+          miniconda-version: 'latest'
+          python-version: ${{ matrix.python-version }}
+          environment-file: sage-test-env.yml
+          activate-environment: sage-test
+      - name: Lint with flake8
+        shell: pwsh
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings.  The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --statistics
+      - name: Test with pytest
+        shell: pwsh
+        run: pytest --cov=./ --cov-report=xml
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1

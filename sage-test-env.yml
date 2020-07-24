@@ -1,0 +1,13 @@
+# References: https://wiki.sagemath.org/Conda
+# https://doc.sagemath.org/html/en/installation/conda.html
+name: sage-test
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - sage>=9.0
+  - python>=3.6
+  - pytest
+  - pytest-cov
+  - coverage
+  - flake8

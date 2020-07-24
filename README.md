@@ -2,6 +2,9 @@
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/edwardmpearce/pyparti/master)
 
+![Test Status](https://github.com/empearce/pyparti/workflows/tests/badge.svg?branch=master)
+[![Coverage Status](https://codecov.io/github/empearce/pyparti/coverage.svg?branch=master)](https://codecov.io/gh/empearce/pyparti)
+
 PyParti (**Py**thon for **Parti**tions) is a tool based on Python (3.6+) and 
 computational mathematics software [SageMath](https://www.sagemath.org/) (9.0+)
 to experiment with [integer partitions](https://en.wikipedia.org/wiki/Partition_(number_theory)), 
