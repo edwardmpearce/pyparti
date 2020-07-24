@@ -3,7 +3,7 @@
 
 """
 This module defines a class `PartitionExt` which extends the `Partition` class in SageMath with methods related to the computation of the generalized core and quotient decomposition as described in [Pearce, 2020].
-    
+
 This module includes the following functions related to constructing partitions from generalised core and quotient data
     * from_G_core_and_quotient(core, quotient, r, b=-1) - Create partition from G-core-quotient decomposition w.r.t. $(r,b)$-action
     * from_G_charges_and_quotient(charges, quotient, r, b=-1) - Create partition from $(r,b)$-charge coordinates and quotient
@@ -146,7 +146,7 @@ class PartitionExt(Partition):
         p_list = [Partition(zero_one=invert_zero_one(wire)) for wire in self.G_abacus(r,b)]
         # Reflect the order of partitions in the $b=-1$ case `G_quotient` to account for differences in conventions for cell colouring 
         # for compatibility with `Partition.quotient`.
-        if label_swap_xy == True:
+        if label_swap_xy:
             p_list = [p_list[0]] + p_list[:0:-1]
         return PartitionTuple(p_list)
     
@@ -197,11 +197,11 @@ def from_G_core_and_quotient(core, quotient, r, b=-1):
         An instance `mu` of PartitionExt such that `mu.G_core(r, b) == core` and `mu.G_quotient(r, b=-1) == quotient`.
     """
     assert isinstance(core, PartitionExt)
-    assert core.is_G_core(r,b) # Verifies whether the first argument is a $G$-core with respect to the $(r,b)$-action.
+    assert core.is_G_core(r, b) # Verifies whether the first argument is a $G$-core with respect to the $(r,b)$-action.
     if quotient is None:
         return core
     else:
-        return from_G_charges_and_quotient(core.G_charges(r,b), quotient, r, b)
+        return from_G_charges_and_quotient(core.G_charges(r, b), quotient, r, b)
 
     
 def from_G_charges_and_quotient(charges, quotient, r, b=-1):

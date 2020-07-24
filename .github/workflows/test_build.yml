@@ -17,8 +17,8 @@ jobs:
     strategy:
       # Spawn and run a job for each of two supported operating systems and three supported Python 3.x versions
       matrix:
-        os: ['ubuntu-latest', 'macos-latest']
-        python: [3.6, 3.7, 3.8]
+        os: ['ubuntu-latest'] #, 'macos-latest']
+        python: [3.7] #[3.6, 3.7, 3.8]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
@@ -33,7 +33,6 @@ jobs:
         with:
           auto-update-conda: true
           auto-activate-base: false
-          channels: defaults,conda-forge
           miniconda-version: 'latest'
           python-version: ${{ matrix.python-version }}
           environment-file: sage-test-env.yml
@@ -47,6 +46,6 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --statistics
       - name: Test with pytest
         shell: pwsh
-        run: pytest --cov=./ --cov-report=xml
+        run: sage -sh; pytest --cov=./ --cov-report=xml
       - name: Upload coverage
         uses: codecov/codecov-action@v1

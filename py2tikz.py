@@ -90,7 +90,7 @@ def partition2tikz(p, x0=0, y0=0, notation='English', label_parts=False):
         output = tikzline(x0, y0, x0 + p[0], y0)
         for index, item in enumerate(p, 1 - y0):
             output += tikzline(x0, -index, x0 + item, -index)
-            if label_parts == True:
+            if label_parts:
                 output += tikznode(x0 - 0.5, 0.5 - index, item)
         output += tikzline(x0, y0, x0, y0 - len(p))            
         for index, item in enumerate(p.conjugate(), x0 + 1):
@@ -99,7 +99,7 @@ def partition2tikz(p, x0=0, y0=0, notation='English', label_parts=False):
         output = tikzline(x0, y0, x0 + p[0], y0)
         for index, item in enumerate(p, y0 + 1):
             output += tikzline(x0, index, x0 + item, index)
-            if label_parts == True:
+            if label_parts:
                 output += tikznode(x0 - 0.5, index - 0.5, item)
         output += tikzline(x0, y0, x0, y0 + len(p))
         for index, item in enumerate(p.conjugate(), x0 + 1):
@@ -108,7 +108,7 @@ def partition2tikz(p, x0=0, y0=0, notation='English', label_parts=False):
         output = tikzline(x0, y0, x0, y0 + p[0])
         for index, item in enumerate(p, x0 + 1):
             output += tikzline(index, y0, index, y0 + item)
-            if label_parts == True:
+            if label_parts:
                 output += tikznode(index - 0.5, y0 - 0.5, item)
         output += tikzline(x0, y0, x0 + len(p), y0)
         for index, item in enumerate(p.conjugate(), y0 + 1):
@@ -117,7 +117,7 @@ def partition2tikz(p, x0=0, y0=0, notation='English', label_parts=False):
         output = tikzline(x0, y0, x0 - p[0], y0 + p[0])
         for i, part in enumerate(p, 1):
             output += tikzline(x0 + i, y0 + i, x0 + i - part, y0 + i + part)
-            if label_parts == True:
+            if label_parts:
                 output += tikznode(x0 + i, y0 - 1 + i, part)
         output += tikzline(x0, y0, x0 + len(p), y0 + len(p))
         for i, part in enumerate(p.conjugate(), 1):
@@ -157,7 +157,7 @@ def label_diagram(p, label_function, notation='English'):
     return output
         
 
-def tikz_ferrers(p, notation = 'English'):
+def tikz_ferrers(p, notation='English'):
     r"""
     Return string for a TikZ command to draw the Ferrers diagram of a partition `p`, with optional `notation` parameter 
     to select the drawing convention from 'English', 'French', 'Russian', and 'Cartesian'. Defaults to 'English'.
@@ -166,11 +166,11 @@ def tikz_ferrers(p, notation = 'English'):
     for i, part in enumerate(p):
         for j in range(part):
             if notation == 'English':
-                output += "\\filldraw ({1},{0}) circle (.2);".format(-i,j)
+                output += "\\filldraw ({1},{0}) circle (.2);".format(-i, j)
             elif notation == 'French':
-                output += "\\filldraw ({1},{0}) circle (.2);".format(i,j)
+                output += "\\filldraw ({1},{0}) circle (.2);".format(i, j)
             elif notation == 'Cartesian':
-                output += "\\filldraw ({0},{1}) circle (.2);".format(i,j)
+                output += "\\filldraw ({0},{1}) circle (.2);".format(i, j)
             else:
                 print(f"{notation} is not a recognised notation. Choose from 'English', 'French', 'Russian', and 'Cartesian'.")
                 return output
@@ -208,7 +208,7 @@ def frobenius2tikz(coords, x0=0, y0=0, notation='English', label_parts=False):
             output += tikzline(x0 + index - 1, y0 - index, x0 + index + item[0], y0 - index)
             output += tikzline(x0 + index - 1, y0 - index - item[1], x0 + index, y0 - index - item[1])
             output += tikzline(x0 + index, y0 - index + 1, x0 + index, y0 - index - item[1]) 
-            if label_parts == True:
+            if label_parts:
                 if item[0] == 0:
                     output += tikznode(x0 + index + 0.5, y0 - index + 0.5, 0)
                 else:
@@ -225,7 +225,7 @@ def frobenius2tikz(coords, x0=0, y0=0, notation='English', label_parts=False):
             output += tikzline(x0 + index - 1, y0 + index, x0 + index + item[0], y0 + index)
             output += tikzline(x0 + index - 1, y0 + index + item[1], x0 + index, y0 + index + item[1])
             output += tikzline(x0 + index, y0 + index - 1, x0 + index, y0 + index + item[1])
-            if label_parts == True:
+            if label_parts:
                 if item[0] == 0:
                     output += tikznode(x0 + index + 0.5, y0 + index - 0.5, 0)
                 else:
@@ -242,7 +242,7 @@ def frobenius2tikz(coords, x0=0, y0=0, notation='English', label_parts=False):
             output += tikzline(x0 + index, y0 + index - 1, x0 + index, y0 + index + item[0])
             output += tikzline(x0 + index + item[1], y0 + index - 1, x0 + index + item[1], y0 + index)
             output += tikzline(x0 + index - 1, y0 + index, x0 + index + item[1], y0 + index)
-            if label_parts == True:
+            if label_parts:
                 if item[0] == 0:
                     output += tikznode(x0 + index - 0.5, y0 + index + 0.5, 0)
                 else:
@@ -259,7 +259,7 @@ def frobenius2tikz(coords, x0=0, y0=0, notation='English', label_parts=False):
             output += tikzline(x0 + 1, y0 + 2*index - 1, x0 - item[0], y0 + 2*index + item[0])
             output += tikzline(x0 + item[1] + 1, y0 + 2*index + item[1] - 1, x0 + item[1], y0 + 2*index + item[1])
             output += tikzline(x0 - 1, y0 + 2*index - 1, x0 + item[1], y0 + 2*index + item[1])
-            if label_parts == True:
+            if label_parts:
                 if item[0] == 0:
                     output += tikznode(x0 - 1, y0 + 2*index, 0)
                 else:
