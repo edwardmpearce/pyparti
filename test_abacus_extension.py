@@ -55,12 +55,12 @@ def test_from_G_core_and_quotient(max_r=15, max_p_size=20):
     """
     for r in range(1, max_r): # Iterate over size of cyclic group
         for b in range(1, r): # Iterate over specific group action
-            if gcd(r,b) != 1: # Skip non-coprime pairs (r,b)
+            if gcd(r, b) != 1: # Skip non-coprime pairs (r,b)
                 continue
             for n in range(max_p_size): # Iterate over partition sizes
                 for p in (PartitionExt(mu) for mu in Partitions(n)): # Iterate over partitions of fixed size
                     # Test bijection between partitions and core-quotient decomposition for given example
-                    assert p == from_G_core_and_quotient(p.G_core(r,b), p.G_quotient(r,b), r, b)
+                    assert p == from_G_core_and_quotient(p.G_core(r, b), p.G_quotient(r, b), r, b)
 
 
 def test_from_G_abacus(max_r=15, max_p_size=20):
@@ -76,12 +76,12 @@ def test_from_G_abacus(max_r=15, max_p_size=20):
     """
     for r in range(1, max_r): # Iterate over size of cyclic group
         for b in range(1, r): # Iterate over specific group action
-            if gcd(r,b) != 1: # Skip non-coprime pairs (r,b)
+            if gcd(r, b) != 1: # Skip non-coprime pairs (r,b)
                 continue
             for n in range(max_p_size): # Iterate over partition sizes
                 for p in (PartitionExt(mu) for mu in Partitions(n)): # Iterate over partitions of fixed size
                     # Test bijection between partitions and abacus representation for given example
-                    assert p == from_G_abacus(p.G_abacus(r,b), r, b)
+                    assert p == from_G_abacus(p.G_abacus(r, b), r, b)
 
 
 def test_special_core(max_r=15, max_p_size=20):
@@ -91,7 +91,7 @@ def test_special_core(max_r=15, max_p_size=20):
     with the existing `Partition.core` method.
     Iterates over partitions of size less than `max_p_size`, and moduli `r` less than `max_r`.
     """
-    assert all(PartitionExt(p).G_core(r) == p.core(r) for n in range(max_p_size) for p in Partitions(n) for r in range(1,max_r))
+    assert all(PartitionExt(p).G_core(r) == p.core(r) for n in range(max_p_size) for p in Partitions(n) for r in range(1, max_r))
 
 
 def test_special_quotient(max_r=15, max_p_size=20):
@@ -106,5 +106,5 @@ def test_special_quotient(max_r=15, max_p_size=20):
     `Partition.content` -> $j - i$, whilst $(r,-1)$-colour -> $i - j (mod r)$ from $(r,b)$-colour -> $i + bj (mod r)$.
     """
     assert all(PartitionExt(p).G_quotient(r, b=-1, label_swap_xy=True) == p.quotient(r) 
-               for n in range(max_p_size) for p in Partitions(n) for r in range(1,max_r))
+               for n in range(max_p_size) for p in Partitions(n) for r in range(1, max_r))
 

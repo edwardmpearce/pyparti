@@ -9,7 +9,7 @@ but writing the code for these by hand can be a labour-intensive task, especiall
 This module is designed to automate much of this process, making it easy to produce high-quality Young diagrams, with the flexibility to
 use Python syntax to iterate the labelling of cells, allowing patterns of interest to be explored.
 Partitions can be drawn in a number of different orientations depending on your preferred convention or to emphasise a different pedagogical viewpoint, including 'English', 'French', 'Russian', and 'Cartesian' notations.
-    
+
 This module includes the following functions, each returning a string containing TikZ commands for drawing diagrams:
     * tikzline(x1, y1, x2, y2, modifier="") - Draw a line from (x1,y1) to (x2,y2), with optional `modifier` string to set draw style
     * tikznode(x, y, text, modifier="") - Draw a node containing the text at (x,y), with optional `modifier` string to set draw style
@@ -63,11 +63,11 @@ def label_cell(i, j, text, notation='English'):
         print(f"{notation} is not a recognised notation. Choose from 'English', 'French', 'Russian', and 'Cartesian'.")
         return ""
     
-        
+
 def partition2tikz(p, x0=0, y0=0, notation='English', label_parts=False):
     r"""
     Return string for a TikZ command to draw the Young diagram of a partition p.
-    
+
     Parameters
     ----------
     p : instance of SageMath `Partition` class
@@ -79,7 +79,7 @@ def partition2tikz(p, x0=0, y0=0, notation='English', label_parts=False):
         from 'English', 'French', 'Russian', and 'Cartesian'. Defaults to 'English'.
     label_parts : Boolean, optional
         If true, labels each row/column corresponding to a part with its size. Defaults to False. 
-    
+
     Returns
     -------
     str
@@ -121,7 +121,7 @@ def partition2tikz(p, x0=0, y0=0, notation='English', label_parts=False):
                 output += tikznode(x0 + i, y0 - 1 + i, part)
         output += tikzline(x0, y0, x0 + len(p), y0 + len(p))
         for i, part in enumerate(p.conjugate(), 1):
-            output += tikzline(x0 - i, y0 + i, x0 - i + part , y0 + i + part)
+            output += tikzline(x0 - i, y0 + i, x0 - i + part, y0 + i + part)
     else:
         print(f"{notation} is not a recognised notation. Choose from 'English', 'French', 'Russian', and 'Cartesian'.")
         return ""
@@ -131,7 +131,7 @@ def partition2tikz(p, x0=0, y0=0, notation='English', label_parts=False):
 def label_diagram(p, label_function, notation='English'):
     r"""
     Return string for TikZ command to label the cells (i,j) of Young diagram of p according to `label_function(p,i,j)`.
-        
+
     Parameters
     ----------
     p : instance of SageMath `Partition` class
@@ -141,7 +141,7 @@ def label_diagram(p, label_function, notation='English'):
     notation : str, optional
         Use the optional parameter `notation` to select the drawing convention 
         from 'English', 'French', 'Russian', and 'Cartesian'. Defaults to 'English'.
-    
+
     Returns
     -------
     str
@@ -155,7 +155,7 @@ def label_diagram(p, label_function, notation='English'):
     for c in p.cells():
         output += label_cell(c[0], c[1], label_function(p, c[0], c[1]))
     return output
-        
+
 
 def tikz_ferrers(p, notation='English'):
     r"""
@@ -180,7 +180,7 @@ def tikz_ferrers(p, notation='English'):
 def frobenius2tikz(coords, x0=0, y0=0, notation='English', label_parts=False):
     r"""
     Return TikZ command to draw diagram explaining Frobenius coordinates of a partition.
-    
+
     Parameters
     ----------
     coords : 2-tuple of lists of the same length
@@ -192,7 +192,7 @@ def frobenius2tikz(coords, x0=0, y0=0, notation='English', label_parts=False):
         from 'English', 'French', 'Russian', and 'Cartesian'. Defaults to 'English'.
     label_parts : Boolean, optional. Defaults to False. 
         If true, labels each arm/leg of a cell on the diagonal with its size (i.e. the Frobenius coordinates).
-    
+
     Returns
     -------
     str
@@ -277,7 +277,7 @@ def label_boundary(seq, col1='blue', col2='orange', notation='English'):
     based on SageMath's `zero_one_sequence` method for the partition class, which uses English notation 
     with boundary path directions North=0 and East=1, so that part size increases along the boundary path. 
     This leads to reading boundary paths from right to left in Russian and Cartesian notations.
-    
+
     Parameters
     ----------
     seq : a sequence of zeros and ones
@@ -287,7 +287,7 @@ def label_boundary(seq, col1='blue', col2='orange', notation='English'):
     notation : str, optional
         Use the optional parameter `notation` to select the drawing convention 
         from 'English', 'French', 'Russian', and 'Cartesian'. Defaults to 'English'.
-    
+
     Returns
     -------
     str
@@ -357,4 +357,4 @@ def writetikz2tex(tikztext, filename):
     with open(filename + ".tex", 'w') as f:
         f.write(header + tikztext + footer)
     return True
-    
+
