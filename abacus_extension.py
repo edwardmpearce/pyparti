@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 
 """
-This module defines a class `PartitionExt` which extends the `Partition` class in SageMath with methods related to the computation of the generalized core and quotient decomposition as described in [Pearce, 2020].
+This module defines a class `PartitionExt` which extends the `Partition` class in SageMath with
+methods related to the computation of the generalized core and quotient decomposition as described in [Pearce, 2020].
+See the docstring of the `PartitionExt` class for a description of the available methods.
 
-This module includes the following functions related to constructing partitions from generalised core and quotient data
+This module further includes the following functions related to constructing partitions from generalised core and quotient data
     * from_G_core_and_quotient(core, quotient, r, b=-1) - Create partition from G-core-quotient decomposition w.r.t. $(r,b)$-action
     * from_G_charges_and_quotient(charges, quotient, r, b=-1) - Create partition from $(r,b)$-charge coordinates and quotient
     * from_G_abacus(abacus, r=None, b=-1) - Create partition from a representation of its $(r,b)$-abacus.
@@ -15,8 +17,9 @@ This module includes the following functions related to constructing partitions 
 from collections import deque # deque is list-like container with faster popleft
 
 # SageMath imports
-import sage.all
+import sage.all # Required to run this module from a Python interpreter/kernel (not required for Sage kernel)
 from sage.combinat.partition import Partition, Partitions
+from sage.combinat.partition_tuple import PartitionTuple # Used for compatibility with `Partition.quotient` method
 from sage.arith.all import gcd
 
 # Local packages
@@ -82,7 +85,7 @@ class PartitionExt(Partition):
         r"""Checks whether `self` is a G-core with respect to the $(r,b)$-action. Returns: Bool
         
         A partition is said to be an $(r,b)$-core if it has no cells satisfying the congruence equation 
-            $$\ell(\square)-b(a(\square)+1)\equiv 0 \ (\mathrm{mod}\ r).$$
+        $$\ell(\square) - b(a(\square) + 1) \equiv 0 \ (\mathrm{mod}\ r).$$
         Equivalently, a partition is said to be an $(r,b)$-core if it is its own $(r,b)$-core 
         (where the latter is defined as in `G_core()`).
         """
@@ -110,7 +113,7 @@ class PartitionExt(Partition):
             abacus[wire_num].append(code)
             # The next wire to read from depends on the value of the current symbol
             # Add b to the wire index if '0' was read, else subtract 1 if '1' was read, then reduce modulo r
-            wire_num = (wire_num + b*(1 - code) - code) % r
+            wire_num = (wire_num + b * (1 - code) - code) % r
         return abacus
     
     
@@ -141,14 +144,13 @@ class PartitionExt(Partition):
         
         Returns: an $r$-tuple of partitions
         """
-        # Import the `PartitionTuple` class and use it as output for compatibility with the `Partition.quotient` method
-        from sage.combinat.partition_tuple import PartitionTuple
         # Sagemath uses the convention {1:E, 0:N} when reading partition from a path sequence, so we have to swap '0's and '1's
         p_list = [Partition(zero_one=invert_zero_one(wire)) for wire in self.G_abacus(r,b)]
         # Reflect the order of partitions in the $b=-1$ case `G_quotient` to account for differences in conventions for cell colouring 
         # for compatibility with `Partition.quotient`.
         if label_swap_xy:
             p_list = [p_list[0]] + p_list[:0:-1]
+        # Cast the list of partitions in the quotient as a `PartitionTuple` for compatibility with the `Partition.quotient` method
         return PartitionTuple(p_list)
     
     
