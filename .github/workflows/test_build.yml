@@ -17,8 +17,8 @@ jobs:
     strategy:
       # Spawn and run a job for each of two supported operating systems and three supported Python 3.x versions
       matrix:
-        os: ['ubuntu-latest'] #, 'macos-latest']
-        python: [3.7] #[3.6, 3.7, 3.8]
+        os: ['ubuntu-latest, 'macos-latest']
+        python: [3.6, 3.7, 3.8]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
@@ -27,7 +27,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ~/conda_pkgs_dir
-          key: conda-${{ matrix.os }}-python-${{ matrix.python-version }}-${{ hashFiles('tests.yml') }}
+          key: conda-${{ matrix.os }}-python-${{ matrix.python-version }}-${{ hashFiles('test_build.yml') }}
       - name: Setup Miniconda
         uses: goanpeca/setup-miniconda@v1
         with:
