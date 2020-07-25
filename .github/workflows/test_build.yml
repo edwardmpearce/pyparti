@@ -17,7 +17,7 @@ jobs:
     strategy:
       # Spawn and run a job for each of two supported operating systems and three supported Python 3.x versions
       matrix:
-        os: ['ubuntu-latest, 'macos-latest']
+        os: ['ubuntu-latest', 'macos-latest']
         python: [3.6, 3.7, 3.8]
     runs-on: ${{ matrix.os }}
     steps:
