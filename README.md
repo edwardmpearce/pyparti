@@ -36,7 +36,8 @@ BinderHub allows many users to start Binder sessions: within a session, BinderHu
 on remote hardware (using repo2docker) then starts a Jupyter service within that environment.
 
 As an end user, all you need to start a BinderHub session is
-1. The URL of an accessible Git repository that contains a software environment definition (e.g. a Python requirements.txt file, Conda environment.yml or a Docker Dockerfile);
+1. The URL of an accessible Git repository that contains a software environment definition 
+   (e.g. a Python `requirements.txt` file, Conda `environment.yml` or a Docker `Dockerfile`);
 2. The branch, tag or commit that you’d like to access within that repository;
 3. (Optional) a relative path within that directory to a Notebook you’d like to run.
 These parameters can be supplied via a web form (as at [mybinder.org](https://mybinder.org/)) or as URL parameters 
