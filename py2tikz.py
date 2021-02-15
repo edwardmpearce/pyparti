@@ -124,7 +124,7 @@ def partition2tikz(p, x0=0, y0=0, notation='English', label_parts=False):
         # Draw lines for columns
         output += "".join(tikzline(x0 - i, y0 + i, x0 - i + part, y0 + i + part) for i, part in enumerate(p.conjugate(), 1))
         if label_parts:
-            output += "".join(tikzline(tikznode(x0 + i, y0 - 1 + i, part) for i, part in enumerate(p, 1))
+            output += "".join(tikzline(tikznode(x0 + i, y0 - 1 + i, part) for i, part in enumerate(p, 1)))
             
     else:
         print(f"{notation} is not a recognised notation. Choose from 'English', 'French', 'Russian', and 'Cartesian'.")
