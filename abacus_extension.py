@@ -139,7 +139,7 @@ class PartitionExt(Partition):
 
         Returns: an instance of the PartitionExt class
         """
-        return from_G_charges_and_quotient(self.G_charges(r,b), quotient=None, r=r, b=b)
+        return self.from_G_charges_and_quotient(self.G_charges(r,b), quotient=None, r=r, b=b)
 
 
     def G_quotient(self, r, b=-1, label_swap_xy=False):
@@ -190,121 +190,123 @@ class PartitionExt(Partition):
         return charges
 
 
+    @classmethod
+    def from_G_core_and_quotient(cls, core, quotient, r, b=-1):
+        r"""
+        Construct a partition from its generalized core and quotient decomposition with respect to the $(r,b)$-action.
+
+        This function checks that the input arguments are valid, in particular that `core` is indeed an $(r,b)$-core partition,
+        Then calculates the charge coordinates of `core` to pass to the function `from_G_charges_and_quotient`.
+
+        Inputs:
+            r, b - Describes G-action. Should have $0 < b < r$ coprime integers, though `b` need only be defined modulo `r`.
+                    Default value for `b` is $-1 \equiv \ (\mathrm{mod}\ r)$ which describes special linear action.
+            core - must be an $(r,b)$-core partition, and must be an instance of PartitionExt
+            quotient - an $r$-tuple of Partition instances, or None. If None, returns `core` directly.
+
+        Returns: 
+            An instance `mu` of PartitionExt such that `mu.G_core(r, b) == core` and `mu.G_quotient(r, b) == quotient`.
+        """
+        assert isinstance(core, PartitionExt)
+        assert core.is_G_core(r, b) # Verifies whether the first argument is a $G$-core with respect to the $(r,b)$-action.
+        if quotient is None:
+            return core
+        else:
+            return cls.from_G_charges_and_quotient(core.G_charges(r, b), quotient, r, b)
+
+
+    @classmethod
+    def from_G_charges_and_quotient(cls, charges, quotient, r, b=-1):
+        r"""
+        Construct a partition from its $(r,b)$-charge coordinates and quotient decomposition.
+
+        First, convert the partitions in `quotient` into path sequences to construct a prelimary abacus.
+        Next, adjust the abacus according to `charges` to match the associated excess/deficit of '1' symbols in each finite wire segment
+        Then pass to the function `from_G_abacus` to flatten and read the path sequence before converting back to a partition.
+
+        Inputs:
+            r, b - Describes G-action. Should have $0 < b < r$ coprime integers, though `b` need only be defined modulo `r`.
+                    Default value for `b` is $-1 \equiv \ r-1 (\mathrm{mod}\ r)$ which describes special linear action.
+            core - must be an $(r,b)$-core partition, and must be an instance of PartitionExt
+            quotient - an $r$-tuple of Partition instances, or None. If None, `quotient` is replaced by an $r$-tuple of empty partitions.
+
+        Returns: 
+            An instance `mu` of PartitionExt such that `mu.G_charges(r, b) == charges` and `mu.G_quotient(r, b) == quotient`.
+        """
+        # Input validation checks
+        assert len(charges) == r
+        assert sum(charges) == 0
+
+        if quotient is None:
+            # Initialize an empty abacus
+            # Full path sequences start with infinitely many '1's and end with infinitely many '0's, but these are all omitted.
+            n = 0
+            abacus = [deque() for _ in range(r)]
+        else:
+            assert len(quotient) == r # Check quotient has correct length
+            # Convert partitions in quotient to Dyck words of equal length
+            # Each wire begins with 2n symbols: n each of the symbols '0' and '1', describing the path sequence of the partition in `quotient`
+            n = max(len(mu.to_dyck_word()) for mu in quotient) // 2
+            abacus = [deque(mu.to_dyck_word(n)) for mu in quotient]
+
+        # Add a number of excess '1's to the left each wire according to the charge coordinates
+        # c_max - charges[i] describes the number of excess 1's on wire i
+        # In total, r * c_max many 1's are added since charges sum to zero
+        c_max = max(charges)
+        for i in range(r):
+            abacus[i].extendleft(1 for _ in range(c_max - charges[i]))
+
+        # Output validation checks
+        assert sum(len(wire) for wire in abacus) == r * (2*n + c_max) # Total number of symbols on whole abacus
+        assert sum(sum(wire) for wire in abacus) == r * (n + c_max) # Total number of '1's on whole abacus    
+
+        return cls.from_G_abacus(abacus, r, b)
+
+
+    @classmethod
+    def from_G_abacus(cls, abacus, r=None, b=-1):
+        r"""
+        Construct a partition from a representation of its $(r,b)$-abacus. If parameter `r` is not given, can be inferred from `len(abacus)`.
+
+        Merges the wires of the abacus back into a single list of '0' and '1' symbols.
+        The resulting sequence encodes a partition boundary path by the rule {1:N, 0:E} as for Dyck paths/words.
+        After the G_abacus is flattened into a path sequence, the final conversion to a partition.
+
+        Returns:
+            An instance `mu` of PartitionExt such that `mu.G_abacus(r, b)` is isomorphic to `abacus` (i.e. describe same quotient and charges)
+        """
+        abacus = [deque(wire) for wire in abacus] # Clean input to cast lists as deque instances to allow use of `popleft` method
+
+        if r is None: # Infer `r` from the number of wires in the abacus
+            r = len(abacus)
+        assert gcd(r,b) == 1 # Check that b is coprime to r to ensure the algorithm will terminate
+
+        path_seq = list()
+        north_steps_read = 0
+        total_north_steps = sum(sum(wire) for wire in abacus)
+        wire_num = total_north_steps % r # Starting wire index depends on the total number of '1's in the abacus
+        while north_steps_read < total_north_steps: # Loop should terminate after at most r*sum(len(wire) for wire in abacus) steps
+            # Read the next symbol from the current wire
+            if len(abacus[wire_num]) > 0:
+                # return and remove the leftmost item from the wire if not empty, this removes the need to track bead position
+                code = abacus[wire_num].popleft()
+            else: # To the right of each wire is an infinite sequence of '0's (used when finished reading finite part)
+                code = 0
+
+            # Add symbol to flattened path sequence
+            path_seq.append(code)
+            # Increase the number of '1's (north steps) read when appropriate (otherwise adding '0')
+            north_steps_read += code
+            # The next wire to read from depends on the value of the current symbol
+            # Add b to the wire index if '0' was read, else subtract 1 if '1' was read, then reduce ulo r
+            wire_num = (wire_num + b*(1 - code) - code) % r
+
+        # Sagemath uses the convention {1:E, 0:N} when reading partition from a path sequence, so we have to swap '0's and '1's
+        inverted_seq = invert_zero_one(path_seq)
+
+        return cls(Partition(zero_one=inverted_seq))
+
+
 def invert_zero_one(sequence):
     r"""Helper function to swap '0's and '1's in a binary sequence"""
     return [1 - code for code in sequence]
-
-
-def from_G_core_and_quotient(core, quotient, r, b=-1):
-    r"""
-    Construct a partition from its generalized core and quotient decomposition with respect to the $(r,b)$-action.
-
-    This function checks that the input arguments are valid, in particular that `core` is indeed an $(r,b)$-core partition,
-    Then calculates the charge coordinates of `core` to pass to the function `from_G_charges_and_quotient`.
-
-    Inputs:
-        r, b - Describes G-action. Should have $0 < b < r$ coprime integers, though `b` need only be defined modulo `r`.
-                Default value for `b` is $-1 \equiv \ (\mathrm{mod}\ r)$ which describes special linear action.
-        core - must be an $(r,b)$-core partition, and must be an instance of PartitionExt
-        quotient - an $r$-tuple of Partition instances, or None. If None, returns `core` directly.
-
-    Returns: 
-        An instance `mu` of PartitionExt such that `mu.G_core(r, b) == core` and `mu.G_quotient(r, b=-1) == quotient`.
-    """
-    assert isinstance(core, PartitionExt)
-    assert core.is_G_core(r, b) # Verifies whether the first argument is a $G$-core with respect to the $(r,b)$-action.
-    if quotient is None:
-        return core
-    else:
-        return from_G_charges_and_quotient(core.G_charges(r, b), quotient, r, b)
-
-
-def from_G_charges_and_quotient(charges, quotient, r, b=-1):
-    r"""
-    Construct a partition from its $(r,b)$-charge coordinates and quotient decomposition.
-
-    First, convert the partitions in `quotient` into path sequences to construct a prelimary abacus.
-    Next, adjust the abacus according to `charges` to match the associated excess/deficit of '1' symbols in each finite wire segment
-    Then pass to the function `from_G_abacus` to flatten and read the path sequence before converting back to a partition.
-
-    Inputs:
-        r, b - Describes G-action. Should have $0 < b < r$ coprime integers, though `b` need only be defined modulo `r`.
-                Default value for `b` is $-1 \equiv \ r-1 (\mathrm{mod}\ r)$ which describes special linear action.
-        core - must be an $(r,b)$-core partition, and must be an instance of PartitionExt
-        quotient - an $r$-tuple of Partition instances, or None. If None, `quotient` is replaced by an $r$-tuple of empty partitions.
-
-    Returns: 
-        An instance `mu` of PartitionExt such that `mu.G_core(r, b) == core` and `mu.G_quotient(r, b=-1) == quotient`.
-    """
-    # Input validation checks
-    assert len(charges) == r
-    assert sum(charges) == 0
-
-    if quotient is None:
-        # Initialize an empty abacus
-        # Full path sequences start with infinitely many '1's and end with infinitely many '0's, but these are all omitted.
-        n = 0
-        abacus = [deque() for _ in range(r)]
-    else:
-        assert len(quotient) == r # Check quotient has correct length
-        # Convert partitions in quotient to Dyck words of equal length
-        # Each wire begins with 2n symbols: n each of the symbols '0' and '1', describing the path sequence of the partition in `quotient`
-        n = max(len(mu.to_dyck_word()) for mu in quotient) // 2
-        abacus = [deque(mu.to_dyck_word(n)) for mu in quotient]
-
-    # Add a number of excess '1's to the left each wire according to the charge coordinates
-    # c_max - charges[i] describes the number of excess 1's on wire i
-    # In total, r * c_max many 1's are added since charges sum to zero
-    c_max = max(charges)
-    for i in range(r):
-        abacus[i].extendleft(1 for _ in range(c_max - charges[i]))
-
-    # Output validation checks
-    assert sum(len(wire) for wire in abacus) == r * (2*n + c_max) # Total number of symbols on whole abacus
-    assert sum(sum(wire) for wire in abacus) == r * (n + c_max) # Total number of '1's on whole abacus    
-
-    return from_G_abacus(abacus, r, b)
-
-
-def from_G_abacus(abacus, r=None, b=-1):
-    r"""
-    Construct a partition from a representation of its $(r,b)$-abacus. If parameter `r` is not given, can be inferred from `len(abacus)`.
-
-    Merges the wires of the abacus back into a single list of '0' and '1' symbols.
-    The resulting sequence encodes a partition boundary path by the rule {1:N, 0:E} as for Dyck paths/words.
-    After the G_abacus is flattened into a path sequence, the final conversion to a partition.
-
-    Returns:
-        An instance `mu` of PartitionExt such that `mu.G_abacus(r, b)` is isomorphic to `abacus` (i.e. describe same quotient and charges)
-    """
-    abacus = [deque(wire) for wire in abacus] # Clean input to cast lists as deque instances to allow use of `popleft` method
-
-    if r is None: # Infer `r` from the number of wires in the abacus
-        r = len(abacus)
-    assert gcd(r,b) == 1 # Check that b is coprime to r to ensure the algorithm will terminate
-
-    path_seq = list()
-    north_steps_read = 0
-    total_north_steps = sum(sum(wire) for wire in abacus)
-    wire_num = total_north_steps % r # Starting wire index depends on the total number of '1's in the abacus
-    while north_steps_read < total_north_steps: # Loop should terminate after at most r*sum(len(wire) for wire in abacus) steps
-        # Read the next symbol from the current wire
-        if len(abacus[wire_num]) > 0:
-            # return and remove the leftmost item from the wire if not empty, this removes the need to track bead position
-            code = abacus[wire_num].popleft()
-        else: # To the right of each wire is an infinite sequence of '0's (used when finished reading finite part)
-            code = 0
-
-        # Add symbol to flattened path sequence
-        path_seq.append(code)
-        # Increase the number of '1's (north steps) read when appropriate (otherwise adding '0')
-        north_steps_read += code
-        # The next wire to read from depends on the value of the current symbol
-        # Add b to the wire index if '0' was read, else subtract 1 if '1' was read, then reduce ulo r
-        wire_num = (wire_num + b*(1 - code) - code) % r
-
-    # Sagemath uses the convention {1:E, 0:N} when reading partition from a path sequence, so we have to swap '0's and '1's
-    inverted_seq = invert_zero_one(path_seq)
-
-    return PartitionExt(Partition(zero_one=inverted_seq))
-
